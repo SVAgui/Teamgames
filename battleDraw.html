@@ -338,8 +338,8 @@ var S={id:null,me:null,host:false,myTeam:null,room:null,players:[],screen:'s-hom
   clr:'#111',sz:3,ers:false,guessed:false,
   timerInt:null,cvSyncInt:null,watchCvInt:null,guessSyncInt:null};
 
-async function gS(k){try{var r=await window.storage.get(k,true);return r?JSON.parse(r.value):null}catch(e){return null}}
-async function sS(k,v){try{await window.storage.set(k,JSON.stringify(v),true)}catch(e){}}
+async function gS(k){try{var r=localStorage.getItem(k);return r?JSON.parse(r):null}catch(e){return null}}
+async function sS(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
 function go(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.getElementById(id).classList.add('active');S.screen=id}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
