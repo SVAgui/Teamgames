@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeamPlay 🎮</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0b1e;--surf:#1a1635;--surf2:#231e47;--coral:#ff6b6b;--yellow:#ffd60a;--purple:#a78bfa;--green:#4ade80;--blue:#60a5fa;--text:#f0eeff;--muted:#7c6fa0;--bord:rgba(167,139,250,0.2)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;background-image:radial-gradient(ellipse at 20% 50%,rgba(167,139,250,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(255,107,107,.08) 0%,transparent 50%)}
+.screen{display:none;min-height:100vh;padding:24px 20px;flex-direction:column;align-items:center;justify-content:center}
+.screen.active{display:flex}
+.logo{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:6px}
+.logo span{color:var(--coral)}
+.tagline{color:var(--muted);font-size:.85rem;margin-bottom:28px}
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:20px;padding:26px;width:100%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.card.wide{max-width:580px}
+.card h2{font-family:'Syne',sans-serif;font-size:1.25rem;margin-bottom:18px}
+input,textarea,select{width:100%;background:var(--surf2);border:1px solid var(--bord);border-radius:12px;padding:11px 15px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.9rem;margin-bottom:12px;outline:none;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--purple)}
+select option{background:var(--surf2)}
+textarea{resize:vertical;min-height:90px}
+label{font-size:.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px}
+.btn{width:100%;padding:13px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:10px}
+.btn:last-child{margin-bottom:0}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--coral);color:#fff}
+.btn-primary:not(:disabled):hover{background:#ff5252;transform:translateY(-1px)}
+.btn-secondary{background:var(--surf2);color:var(--text);border:1px solid var(--bord)}
+.btn-secondary:hover{border-color:var(--purple)}
+.btn-yellow{background:var(--yellow);color:#0d0b1e}
+.btn-yellow:not(:disabled):hover{background:#ffc800;transform:translateY(-1px)}
+.btn-green{background:var(--green);color:#0d0b1e}
+.btn-green:not(:disabled):hover{background:#22c55e}
+.btn-purple{background:var(--purple);color:#fff}
+.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.game-card{background:var(--surf2);border:2px solid var(--bord);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;text-align:center}
+.game-card:hover{border-color:var(--purple)}
+.game-card.selected{border-color:var(--coral);background:rgba(255,107,107,.08)}
+.gc-icon{font-size:1.6rem;margin-bottom:6px}
+.gc-name{font-weight:800;font-size:.82rem;font-family:'Syne',sans-serif}
+.gc-desc{font-size:.68rem;color:var(--muted);margin-top:3px;line-height:1.3}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--surf2);border:1px solid var(--bord);border-radius:20px;padding:4px 12px;font-size:.74rem;color:var(--muted);margin-bottom:18px}
+.bdot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.plist{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;max-height:200px;overflow-y:auto}
+.pitem{display:flex;align-items:center;justify-content:space-between;background:var(--surf2);border-radius:10px;padding:9px 13px;font-size:.85rem}
+.pname{font-weight:700}
+.pstatus{font-size:.7rem;padding:2px 8px;border-radius:10px}
+.sw{background:rgba(124,111,160,.2);color:var(--muted)}
+.sd{background:rgba(74,222,128,.15);color:var(--green)}
+.sh{background:rgba(255,214,10,.15);color:var(--yellow)}
+.swolf{background:rgba(255,107,107,.15);color:var(--coral)}
+.linkbox{display:flex;gap:8px;align-items:center;background:var(--surf2);border:1px solid var(--bord);border-radius:12px;padding:10px 14px;margin-bottom:18px}
+.linkbox span{flex:1;font-size:.76rem;color:var(--purple);word-break:break-all}
+.linkbox button{background:var(--purple);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.room-code{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--yellow);letter-spacing:.1em;text-align:center;margin-bottom:14px}
+.rank-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.rank-item{display:flex;align-items:center;gap:10px;background:var(--surf2);border:2px solid transparent;border-radius:12px;padding:11px 13px;cursor:grab;transition:all .15s;user-select:none}
+.rank-item.dragging{opacity:.4;border-color:var(--purple)}
+.rank-item.drag-over{border-color:var(--coral);background:rgba(255,107,107,.08)}
+.rank-num{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--coral);min-width:26px}
+.rank-text{flex:1;font-weight:700;font-size:.88rem}
+.rank-arrows button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.72rem;padding:2px 4px;border-radius:4px;display:block;line-height:1}
+.rank-arrows button:hover{color:var(--text);background:rgba(255,255,255,.1)}
+.res-list{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+.res-item{display:flex;align-items:center;gap:12px;background:var(--surf2);border-radius:12px;padding:11px 14px}
+.res-rank{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;min-width:34px}
+.r1{color:var(--yellow)}.r2{color:#c0c0c0}.r3{color:#cd7f32}.rn{color:var(--muted)}
+.res-info{flex:1}
+.res-name{font-weight:700;font-size:.88rem;margin-bottom:4px}
+.res-bar-wrap{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.res-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--coral),var(--purple))}
+.res-score{font-size:.76rem;color:var(--muted);font-weight:700}
+.canvas-wrap{position:relative;margin-bottom:12px;border-radius:14px;overflow:hidden;border:2px solid var(--bord)}
+#draw-canvas{display:block;width:100%;touch-action:none;background:#fff;cursor:crosshair}
+.draw-tools{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.color-btn{width:28px;height:28px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .15s;flex-shrink:0}
+.color-btn.active{border-color:#fff;transform:scale(1.2)}
+.tool-btn{background:var(--surf2);border:1px solid var(--bord);border-radius:8px;padding:5px 10px;color:var(--text);font-size:.75rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
+.tool-btn.active{border-color:var(--purple);background:rgba(167,139,250,.15)}
+.prompt-box{background:rgba(255,214,10,.08);border:1px solid rgba(255,214,10,.2);border-radius:12px;padding:12px 16px;margin-bottom:14px;text-align:center}
+.prompt-label{font-size:.7rem;color:var(--yellow);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.prompt-text{font-size:1.1rem;font-weight:800;font-family:'Syne',sans-serif}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.gcard{background:var(--surf2);border:2px solid var(--bord);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .15s}
+.gcard:hover{border-color:var(--purple)}
+.gcard.selected{border-color:var(--coral)}
+.gcard.mine{opacity:.6;cursor:default}
+.gcard img{width:100%;display:block}
+.gcard-lbl{padding:7px;text-align:center;font-size:.75rem;font-weight:700}
+.role-reveal{text-align:center;padding:20px 0}
+.role-icon{font-size:4rem;margin-bottom:12px}
+.role-name{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:8px}
+.wv-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.wv-item{display:flex;align-items:center;justify-content:space-between;background:var(--surf2);border:2px solid transparent;border-radius:12px;padding:11px 14px;cursor:pointer;transition:all .15s}
+.wv-item:hover{border-color:var(--purple)}
+.wv-item.selected{border-color:var(--coral);background:rgba(255,107,107,.08)}
+.phone-chain{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.chain-step{background:var(--surf2);border-radius:12px;padding:13px;border-left:3px solid var(--purple)}
+.chain-step.td{border-left-color:var(--coral)}
+.chain-step.tt{border-left-color:var(--blue)}
+.chain-meta{font-size:.7rem;color:var(--muted);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.chain-step img{width:100%;border-radius:8px}
+.chain-text{font-size:.88rem;font-weight:600;font-style:italic}
+.voff-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.voff-opt{display:flex;align-items:center;justify-content:space-between;background:var(--surf2);border:2px solid transparent;border-radius:12px;padding:11px 14px;cursor:pointer;transition:all .15s}
+.voff-opt:hover{border-color:var(--purple)}
+.voff-opt.selected{border-color:var(--coral);background:rgba(255,107,107,.08)}
+.info-box{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:12px;padding:11px 15px;font-size:.78rem;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.info-box strong{color:var(--purple)}
+.slabel{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.prog{text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:14px}
+.prog strong{color:var(--green)}
+.waiting{text-align:center;padding:24px 0}
+.wi{font-size:2.8rem;animation:bounce 1s infinite alternate}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+.waiting p{color:var(--muted);font-size:.82rem;margin-top:10px}
+.subnote{text-align:center;color:var(--green);font-weight:700;padding:16px 0;font-size:.88rem}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surf2);border:1px solid var(--bord);border-radius:12px;padding:11px 18px;font-size:.82rem;font-weight:700;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.elimbox{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);border-left:3px solid var(--coral);border-radius:12px;padding:14px;margin-bottom:16px;text-align:center}
+.elim-lbl{font-size:.7rem;color:var(--coral);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.elim-name{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800}
+.winner-box{text-align:center;padding:20px 0}
+.winner-icon{font-size:3.5rem;margin-bottom:10px}
+.winner-name{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--yellow)}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="s-home">
+  <div style="font-size:2.5rem;margin-bottom:8px">🎮</div>
+  <div class="logo">Team<span>Play</span></div>
+  <div class="tagline">Work games that actually slap</div>
+  <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px">
+    <button class="btn btn-primary" onclick="go('s-create')">🎯 Create a Room</button>
+    <button class="btn btn-secondary" onclick="go('s-join')">🔗 Join a Room</button>
+  </div>
+</div>
+
+<!-- CREATE -->
+<div class="screen" id="s-create">
+<div class="card" style="max-width:520px">
+  <h2>🎯 Create a Room</h2>
+  <label>Your Name (Host)</label>
+  <input id="c-host" type="text" placeholder="e.g. Sarah" maxlength="30">
+  <label>Pick a Game</label>
+  <div class="game-grid">
+    <div class="game-card selected" onclick="selGame(this,'rank')"><div class="gc-icon">📊</div><div class="gc-name">Rank List</div><div class="gc-desc">Team ranks items, see the consensus</div></div>
+    <div class="game-card" onclick="selGame(this,'draw')"><div class="gc-icon">🎨</div><div class="gc-name">Battle Draw</div><div class="gc-desc">Draw a prompt, team votes best</div></div>
+    <div class="game-card" onclick="selGame(this,'wolf')"><div class="gc-icon">🐺</div><div class="gc-name">Werewolf</div><div class="gc-desc">Find the wolves hiding in the team</div></div>
+    <div class="game-card" onclick="selGame(this,'phone')"><div class="gc-icon">📞</div><div class="gc-name">Telephone</div><div class="gc-desc">Pass it along, watch it mutate</div></div>
+    <div class="game-card" onclick="selGame(this,'voff')" style="grid-column:span 2"><div class="gc-icon">🗳️</div><div class="gc-name">Vote Off</div><div class="gc-desc">Eliminate options round by round until one winner</div></div>
+  </div>
+  <div id="cfg-rank">
+    <label>Game Title</label><input id="c-rank-title" type="text" placeholder="Rank the best work snacks 🍕" maxlength="60">
+    <label>Items to Rank (one per line, 3–10)</label><textarea id="c-rank-items" placeholder="Pizza&#10;Tacos&#10;Sushi&#10;Burgers&#10;Salad"></textarea>
+  </div>
+  <div id="cfg-draw" style="display:none"><label>Drawing Prompt</label><input id="c-draw-prompt" type="text" placeholder="A cat riding a unicorn 🦄" maxlength="80"></div>
+  <div id="cfg-wolf" style="display:none"><label>Number of Wolves 🐺</label><select id="c-wolf-n"><option value="1">1 Wolf (4–6 players)</option><option value="2">2 Wolves (7–10 players)</option><option value="3">3 Wolves (11+ players)</option></select></div>
+  <div id="cfg-phone" style="display:none"><label>Starting Phrase</label><input id="c-phone-phrase" type="text" placeholder="A penguin eating a hot dog on the moon 🐧" maxlength="100"></div>
+  <div id="cfg-voff" style="display:none">
+    <label>Game Title</label><input id="c-voff-title" type="text" placeholder="Best Pizza Topping Survivor 🍕" maxlength="60">
+    <label>Options (one per line, 4–10)</label><textarea id="c-voff-items" placeholder="Pepperoni&#10;Mushrooms&#10;Pineapple&#10;Olives&#10;Jalapeños"></textarea>
+  </div>
+  <button class="btn btn-primary" onclick="doCreate()">🚀 Create Room</button>
+  <button class="btn btn-secondary" onclick="go('s-home')">← Back</button>
+</div>
+</div>
+
+<!-- JOIN -->
+<div class="screen" id="s-join">
+<div class="card">
+  <h2>🔗 Join a Room</h2>
+  <label>Room Code</label><input id="j-code" type="text" placeholder="ROOM-ABC123" style="text-transform:uppercase">
+  <label>Your Name</label><input id="j-name" type="text" placeholder="e.g. Marcus" maxlength="30">
+  <button class="btn btn-primary" onclick="doJoin()">🎮 Join Game</button>
+  <button class="btn btn-secondary" onclick="go('s-home')">← Back</button>
+</div>
+</div>
+
+<!-- HOST LOBBY -->
+<div class="screen" id="s-host-lobby">
+<div class="card">
+  <div class="badge"><div class="bdot"></div>Waiting for players...</div>
+  <h2 id="hl-title">Game</h2>
+  <div class="slabel">Share this link</div>
+  <div class="linkbox"><span id="hl-link">—</span><button onclick="copyLink()">Copy</button></div>
+  <div class="room-code" id="hl-code">ROOM-XXXX</div>
+  <div class="slabel">Players Joined (<span id="hl-pcount">0</span>)</div>
+  <div class="plist" id="hl-plist"></div>
+  <div class="info-box" id="hl-info">Share the link in Zoom chat!</div>
+  <button class="btn btn-yellow" id="hl-start" onclick="doStart()" disabled>⏳ Need more players...</button>
+</div>
+</div>
+
+<!-- PLAYER LOBBY -->
+<div class="screen" id="s-player-lobby">
+<div class="card">
+  <div class="badge"><div class="bdot"></div>In the lobby</div>
+  <h2 id="pl-title">Game</h2>
+  <div class="waiting"><div class="wi">⏳</div><p>Waiting for the host to start...</p></div>
+  <div class="slabel">Players (<span id="pl-count">0</span>)</div>
+  <div class="plist" id="pl-plist"></div>
+</div>
+</div>
+
+<!-- RANK: RANKING -->
+<div class="screen" id="s-ranking">
+<div class="card wide">
+  <div class="badge"><div class="bdot"></div>Game on!</div>
+  <h2 id="rk-title">Rank these!</h2>
+  <div class="info-box">Drag items to reorder — <strong>#1 is your top pick!</strong> Use ▲▼ if needed.</div>
+  <div class="prog" id="rk-prog"></div>
+  <ul class="rank-list" id="rk-list"></ul>
+  <div id="rk-btn-wrap"><button class="btn btn-green" onclick="rankSubmit()">✅ Submit My Ranking</button></div>
+  <div class="subnote" id="rk-done" style="display:none">✅ Submitted! Waiting for others...</div>
+</div>
+</div>
+
+<!-- RANK: RESULTS -->
+<div class="screen" id="s-rank-results">
+<div class="card wide">
+  <h2>🏆 Team Rankings</h2>
+  <div class="slabel" id="rr-sub"></div>
+  <div class="res-list" id="rr-list"></div>
+  <button class="btn btn-secondary" onclick="go('s-home')">🏠 Home</button>
+</div>
+</div>
+
+<!-- DRAW: CANVAS -->
+<div class="screen" id="s-draw">
+<div class="card wide">
+  <div class="badge"><div class="bdot"></div>Draw time!</div>
+  <div class="prompt-box"><div class="prompt-label">Your Prompt</div><div class="prompt-text" id="dr-prompt">...</div></div>
+  <div class="draw-tools">
+    <div class="color-btn active" style="background:#111" onclick="setColor('#111',this)"></div>
+    <div class="color-btn" style="background:#ef4444" onclick="setColor('#ef4444',this)"></div>
+    <div class="color-btn" style="background:#3b82f6" onclick="setColor('#3b82f6',this)"></div>
+    <div class="color-btn" style="background:#22c55e" onclick="setColor('#22c55e',this)"></div>
+    <div class="color-btn" style="background:#f59e0b" onclick="setColor('#f59e0b',this)"></div>
+    <div class="color-btn" style="background:#a855f7" onclick="setColor('#a855f7',this)"></div>
+    <div class="color-btn" style="background:#ec4899" onclick="setColor('#ec4899',this)"></div>
+    <button class="tool-btn active" id="bsm" onclick="setBrush(3,this)">Thin</button>
+    <button class="tool-btn" id="blg" onclick="setBrush(10,this)">Thick</button>
+    <button class="tool-btn" id="beraser" onclick="setEraser(this)">⌫ Erase</button>
+    <button class="tool-btn" onclick="clearCanvas()">🗑 Clear</button>
+  </div>
+  <div class="canvas-wrap"><canvas id="draw-canvas" width="800" height="450"></canvas></div>
+  <button class="btn btn-green" id="dr-sub-btn" onclick="drawSubmit()">✅ Submit Drawing</button>
+  <div class="subnote" id="dr-done" style="display:none">✅ Drawing submitted! Waiting for others...</div>
+</div>
+</div>
+
+<!-- DRAW: VOTE -->
+<div class="screen" id="s-draw-vote">
+<div class="card wide">
+  <h2>🗳️ Vote for the Best!</h2>
+  <div class="info-box">Tap the drawing you think is best. <strong>You can't vote for your own!</strong></div>
+  <div class="gallery" id="dr-gallery"></div>
+  <button class="btn btn-green" id="dv-btn" onclick="drawVoteSubmit()" disabled>Select a drawing first</button>
+  <div class="subnote" id="dv-done" style="display:none">✅ Vote submitted! Waiting for results...</div>
+</div>
+</div>
+
+<!-- DRAW: RESULTS -->
+<div class="screen" id="s-draw-results">
+<div class="card wide">
+  <h2>🏆 Drawing Results</h2>
+  <div class="res-list" id="dr-res"></div>
+  <button class="btn btn-secondary" onclick="go('s-home')">🏠 Home</button>
+</div>
+</div>
+
+<!-- WOLF: ROLE REVEAL -->
+<div class="screen" id="s-wolf-role">
+<div class="card">
+  <h2>🐺 Your Secret Role</h2>
+  <div class="info-box"><strong>Keep your screen private!</strong> Don't show anyone your role.</div>
+  <div class="role-reveal" id="wf-reveal"></div>
+  <button class="btn btn-yellow" onclick="wolfReady()">✅ Got it — I'm Ready</button>
+</div>
+</div>
+
+<!-- WOLF: DAY VOTE -->
+<div class="screen" id="s-wolf-day">
+<div class="card">
+  <div class="badge"><div class="bdot"></div>☀️ Day Phase — Round <span id="wd-round">1</span></div>
+  <h2>Vote to Eliminate</h2>
+  <div class="info-box" id="wd-info">Discuss on Zoom, then vote out your top suspect.</div>
+  <div class="prog" id="wd-prog"></div>
+  <div class="wv-list" id="wd-list"></div>
+  <button class="btn btn-primary" id="wd-btn" onclick="wolfDayVote()" disabled>🗳️ Submit Vote</button>
+  <div class="subnote" id="wd-done" style="display:none">✅ Voted! Waiting for others...</div>
+</div>
+</div>
+
+<!-- WOLF: NIGHT (WOLF) -->
+<div class="screen" id="s-wolf-night-wolf">
+<div class="card">
+  <div class="badge"><div class="bdot"></div>🌙 Night Phase — Wolves Only</div>
+  <h2>Choose Your Target</h2>
+  <div class="info-box">You are a <strong style="color:var(--coral)">🐺 Wolf</strong>. Pick a villager to eliminate.</div>
+  <div class="wv-list" id="wn-list"></div>
+  <button class="btn btn-primary" id="wn-btn" onclick="wolfNightVote()" disabled>🌙 Eliminate</button>
+  <div class="subnote" id="wn-done" style="display:none">✅ Voted! Waiting for dawn...</div>
+</div>
+</div>
+
+<!-- WOLF: NIGHT (VILLAGER WAIT) -->
+<div class="screen" id="s-wolf-night-sleep">
+<div class="card">
+  <div class="badge"><div class="bdot"></div>🌙 Night Phase</div>
+  <div class="waiting"><div class="wi">😴</div><p>You are sleeping...<br>The wolves are deciding their target.</p></div>
+</div>
+</div>
+
+<!-- WOLF: ELIMINATION REVEAL -->
+<div class="screen" id="s-wolf-elim">
+<div class="card">
+  <h2 id="we-title">Elimination!</h2>
+  <div class="elimbox">
+    <div class="elim-lbl" id="we-phase">Eliminated</div>
+    <div class="elim-name" id="we-name">—</div>
+    <div style="margin-top:6px;font-size:.78rem;color:var(--muted)" id="we-role">Their role: —</div>
+  </div>
+  <div id="we-host-ctrl" style="display:none">
+    <div class="info-box" id="we-status"></div>
+    <button class="btn btn-yellow" onclick="wolfContinue()">Continue →</button>
+    <button class="btn btn-secondary" onclick="wolfEndNow()">🏁 End Game Now</button>
+  </div>
+  <div class="subnote" id="we-wait" style="display:none">Waiting for host to continue...</div>
+</div>
+</div>
+
+<!-- WOLF: GAME OVER -->
+<div class="screen" id="s-wolf-end">
+<div class="card">
+  <div class="winner-box">
+    <div class="winner-icon" id="wend-icon">🎉</div>
+    <div class="winner-name" id="wend-title">Winner!</div>
+    <div style="color:var(--muted);font-size:.85rem;margin-top:8px" id="wend-desc"></div>
+  </div>
+  <div class="slabel" style="margin-top:20px">Full Role Reveal</div>
+  <div class="plist" id="wend-list"></div>
+  <button class="btn btn-secondary" onclick="go('s-home')" style="margin-top:16px">🏠 Home</button>
+</div>
+</div>
+
+<!-- PHONE: WAIT -->
+<div class="screen" id="s-phone-wait">
+<div class="card">
+  <div class="badge"><div class="bdot"></div>📞 Telephone</div>
+  <h2>Waiting for Your Turn...</h2>
+  <div class="waiting"><div class="wi">📱</div><p id="ph-wait-msg">Someone is working on their step...</p></div>
+  <div class="prog" id="ph-wait-prog"></div>
+</div>
+</div>
+
+<!-- PHONE: DESCRIBE -->
+<div class="screen" id="s-phone-text">
+<div class="card wide">
+  <div class="badge"><div class="bdot"></div>Your Turn!</div>
+  <h2>Describe What You See</h2>
+  <div id="ph-prev-wrap" style="margin-bottom:14px;border-radius:12px;overflow:hidden;border:1px solid var(--bord)"></div>
+  <label>Describe in one sentence</label>
+  <input id="ph-txt" type="text" placeholder="A dog wearing sunglasses on a beach..." maxlength="120">
+  <button class="btn btn-green" onclick="phoneTextSubmit()">✅ Submit Description</button>
+</div>
+</div>
+
+<!-- PHONE: DRAW -->
+<div class="screen" id="s-phone-draw">
+<div class="card wide">
+  <div class="badge"><div class="bdot"></div>Your Turn — Draw It!</div>
+  <div class="prompt-box"><div class="prompt-label">Draw this phrase</div><div class="prompt-text" id="ph-draw-prompt">...</div></div>
+  <div class="draw-tools">
+    <div class="color-btn active" style="background:#111" onclick="setColor('#111',this)"></div>
+    <div class="color-btn" style="background:#ef4444" onclick="setColor('#ef4444',this)"></div>
+    <div class="color-btn" style="background:#3b82f6" onclick="setColor('#3b82f6',this)"></div>
+    <div class="color-btn" style="background:#22c55e" onclick="setColor('#22c55e',this)"></div>
+    <div class="color-btn" style="background:#f59e0b" onclick="setColor('#f59e0b',this)"></div>
+    <div class="color-btn" style="background:#a855f7" onclick="setColor('#a855f7',this)"></div>
+    <button class="tool-btn active" onclick="setBrush(3,this)">Thin</button>
+    <button class="tool-btn" onclick="setBrush(10,this)">Thick</button>
+    <button class="tool-btn" onclick="setEraser(this)">⌫ Erase</button>
+    <button class="tool-btn" onclick="clearCanvas()">🗑 Clear</button>
+  </div>
+  <div class="canvas-wrap"><canvas id="draw-canvas" width="800" height="450"></canvas></div>
+  <button class="btn btn-green" onclick="phoneDrawSubmit()">✅ Submit Drawing</button>
+</div>
+</div>
+
+<!-- PHONE: REVEAL -->
+<div class="screen" id="s-phone-reveal">
+<div class="card wide">
+  <h2>📞 The Full Chain!</h2>
+  <div class="info-box">See how the original phrase evolved through the team 👇</div>
+  <div class="phone-chain" id="ph-chain"></div>
+  <button class="btn btn-secondary" onclick="go('s-home')">🏠 Home</button>
+</div>
+</div>
+
+<!-- VOFF: VOTE -->
+<div class="screen" id="s-voff-vote">
+<div class="card">
+  <div class="badge"><div class="bdot"></div>Vote Off — Round <span id="vo-round">1</span></div>
+  <h2 id="vo-title">Vote to Eliminate</h2>
+  <div class="info-box">Pick the one you want <strong>gone</strong> this round. Most votes gets cut!</div>
+  <div class="prog" id="vo-prog"></div>
+  <div class="voff-opts" id="vo-opts"></div>
+  <button class="btn btn-primary" id="vo-btn" onclick="voffVote()" disabled>🗳️ Cast Vote</button>
+  <div class="subnote" id="vo-done" style="display:none">✅ Voted! Waiting for others...</div>
+</div>
+</div>
+
+<!-- VOFF: ELIM ROUND -->
+<div class="screen" id="s-voff-elim">
+<div class="card">
+  <h2>Round Results</h2>
+  <div class="elimbox">
+    <div class="elim-lbl">❌ Eliminated</div>
+    <div class="elim-name" id="vo-elim-name">—</div>
+    <div style="margin-top:5px;font-size:.76rem;color:var(--muted)" id="vo-elim-votes"></div>
+  </div>
+  <div class="slabel">Still In</div>
+  <div class="voff-opts" id="vo-remaining" style="margin-bottom:16px;pointer-events:none"></div>
+  <div id="vo-host-ctrl" style="display:none"><button class="btn btn-yellow" onclick="voffNext()">Next Round →</button></div>
+  <div class="subnote" id="vo-wait" style="display:none">Waiting for host to start next round...</div>
+</div>
+</div>
+
+<!-- VOFF: WINNER -->
+<div class="screen" id="s-voff-winner">
+<div class="card">
+  <div class="winner-box">
+    <div class="winner-icon">🏆</div>
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:6px">The Winner Is</div>
+    <div class="winner-name" id="vo-winner">—</div>
+  </div>
+  <div class="slabel" style="margin-top:20px">Elimination Order</div>
+  <div class="res-list" id="vo-history"></div>
+  <button class="btn btn-secondary" onclick="go('s-home')" style="margin-top:16px">🏠 Home</button>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+var S={id:null,me:null,host:false,room:null,players:[],game:'rank',screen:'s-home',poll:null,
+  myRank:[],rankDone:false,
+  drawColor:'#111',drawSize:3,eraser:false,drawVote:null,drawDone:false,
+  wolfRole:null,wolfVote:null,
+  phoneStep:-1,
+  voffChoice:null
+};
+
+// ── STORAGE ────────────────────────────────────────────────────
+async function gS(k){try{var r=await window.storage.get(k,true);return r?JSON.parse(r.value):null}catch(e){return null}}
+async function sS(k,v){try{await window.storage.set(k,JSON.stringify(v),true)}catch(e){}}
+
+// ── UTILS ──────────────────────────────────────────────────────
+function go(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.getElementById(id).classList.add('active');S.screen=id}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function uid(){return 'ROOM-'+Math.random().toString(36).substr(2,6).toUpperCase()}
+function startP(){if(S.poll)clearInterval(S.poll);S.poll=setInterval(poll,2500)}
+function stopP(){if(S.poll)clearInterval(S.poll)}
+function copyLink(){var l=location.href.split('?')[0].split('#')[0]+'#'+S.id;navigator.clipboard.writeText(l).catch(function(){});toast('📋 Copied!')}
+function selGame(el,g){document.querySelectorAll('.game-card').forEach(function(c){c.classList.remove('selected')});el.classList.add('selected');S.game=g;['rank','draw','wolf','phone','voff'].forEach(function(n){document.getElementById('cfg-'+n).style.display=n===g?'':'none'})}
+
+// ── CREATE ─────────────────────────────────────────────────────
+async function doCreate(){
+  var host=document.getElementById('c-host').value.trim();
+  if(!host)return toast('👋 Enter your name!');
+  var g=S.game,cfg={};
+  if(g==='rank'){
+    var t=document.getElementById('c-rank-title').value.trim();
+    var items=document.getElementById('c-rank-items').value.trim().split('\n').map(function(x){return x.trim()}).filter(Boolean);
+    if(!t)return toast('📝 Add a title!');
+    if(items.length<3)return toast('📋 Need at least 3 items!');
+    if(items.length>10)return toast('📋 Max 10 items!');
+    cfg={title:t,items:items};
+  } else if(g==='draw'){
+    var pr=document.getElementById('c-draw-prompt').value.trim();
+    if(!pr)return toast('🎨 Add a drawing prompt!');
+    cfg={title:'🎨 Battle Draw',prompt:pr};
+  } else if(g==='wolf'){
+    cfg={title:'🐺 Werewolf',wolves:parseInt(document.getElementById('c-wolf-n').value)};
+  } else if(g==='phone'){
+    var ph=document.getElementById('c-phone-phrase').value.trim();
+    if(!ph)return toast('📞 Add a starting phrase!');
+    cfg={title:'📞 Telephone',phrase:ph};
+  } else if(g==='voff'){
+    var vt=document.getElementById('c-voff-title').value.trim();
+    var vi=document.getElementById('c-voff-items').value.trim().split('\n').map(function(x){return x.trim()}).filter(Boolean);
+    if(!vt)return toast('📝 Add a title!');
+    if(vi.length<4)return toast('📋 Need at least 4 options!');
+    if(vi.length>10)return toast('📋 Max 10 options!');
+    cfg={title:vt,items:vi};
+  }
+  var rid=uid();
+  var room={game:g,cfg:cfg,status:'lobby',hostName:host,gs:{},createdAt:Date.now()};
+  await sS('room-'+rid,room);
+  await sS('room-'+rid+'-players',[{name:host,submitted:false,isHost:true,alive:true,joinedAt:Date.now()}]);
+  S.id=rid;S.me=host;S.host=true;S.room=room;S.game=g;
+  renderHL(rid,room,[{name:host,isHost:true}]);
+  go('s-host-lobby');startP();
+}
+
+// ── JOIN ───────────────────────────────────────────────────────
+async function doJoin(){
+  var code=document.getElementById('j-code').value.trim().toUpperCase();
+  var name=document.getElementById('j-name').value.trim();
+  if(!code)return toast('🔑 Enter a room code!');
+  if(!name)return toast('👋 Enter your name!');
+  if(code.includes('#'))code=code.split('#').pop();
+  if(!code.startsWith('ROOM-'))code='ROOM-'+code;
+  var room=await gS('room-'+code);
+  if(!room)return toast('❌ Room not found!');
+  if(room.status==='results')return toast('🏁 Game already ended!');
+  var players=await gS('room-'+code+'-players')||[];
+  if(!players.find(function(p){return p.name.toLowerCase()===name.toLowerCase()})){
+    players.push({name:name,submitted:false,isHost:false,alive:true,joinedAt:Date.now()});
+    await sS('room-'+code+'-players',players);
+  }
+  S.id=code;S.me=name;S.host=false;S.room=room;S.game=room.game;
+  if(room.status==='lobby'){renderPL(room,players);go('s-player-lobby');}
+  else{launchGame(room,players);}
+  startP();
+}
+
+// ── LOBBY RENDER ───────────────────────────────────────────────
+function renderHL(rid,room,players){
+  document.getElementById('hl-title').textContent=room.cfg.title||'Game';
+  document.getElementById('hl-code').textContent=rid;
+  document.getElementById('hl-link').textContent=location.href.split('?')[0].split('#')[0]+'#'+rid;
+  document.getElementById('hl-pcount').textContent=players.length;
+  document.getElementById('hl-plist').innerHTML=players.map(function(p){return'<div class="pitem"><span class="pname">'+esc(p.name)+'</span><span class="pstatus '+(p.isHost?'sh':p.submitted?'sd':'sw')+'">'+(p.isHost?'👑 Host':p.submitted?'✅ Ready':'⏳')+'</span></div>'}).join('');
+  var min=room.game==='wolf'?4:room.game==='phone'?3:2;
+  var btn=document.getElementById('hl-start');
+  btn.disabled=players.length<min;
+  btn.textContent=players.length<min?('⏳ Need '+(min-players.length)+' more...'):('⚡ Start ('+players.length+' players)');
+}
+function renderPL(room,players){
+  document.getElementById('pl-title').textContent=room.cfg.title||'Game';
+  document.getElementById('pl-count').textContent=players.length;
+  document.getElementById('pl-plist').innerHTML=players.map(function(p){return'<div class="pitem"><span class="pname">'+esc(p.name)+(p.name===S.me?' <span style="color:var(--purple);font-size:.7rem">(you)</span>':'')+'</span><span class="pstatus '+(p.isHost?'sh':'sw')+'">'+(p.isHost?'👑 Host':'⏳')+'</span></div>'}).join('');
+}
+
+// ── START GAME ─────────────────────────────────────────────────
+async function doStart(){
+  var room=await gS('room-'+S.id);
+  var players=await gS('room-'+S.id+'-players')||[];
+  room.status='playing';
+  if(room.game==='wolf'){
+    var n=room.cfg.wolves||1;
+    var names=players.map(function(p){return p.name}).sort(function(){return Math.random()-.5});
+    var roles={};
+    for(var i=0;i<names.length;i++){var r=i<n?'wolf':'villager';await sS('room-'+S.id+'-role-'+names[i],r);roles[names[i]]=r;}
+    room.gs={phase:'role',round:1,dayVotes:{},nightVotes:{},eliminated:[],roles:roles};
+  } else if(room.game==='phone'){
+    await sS('room-'+S.id+'-chain-0',{type:'text',content:room.cfg.phrase,by:room.hostName});
+    room.gs={step:1,total:players.length};
+  } else if(room.game==='voff'){
+    room.gs={opts:[...room.cfg.items],eliminated:[],round:1,votes:{},phase:'vote'};
+  } else if(room.game==='draw'){
+    room.gs={phase:'draw'};
+  }
+  await sS('room-'+S.id,room);
+  S.room=room;
+  launchGame(room,players);
+}
+
+function launchGame(room,players){
+  var g=room.game;
+  if(g==='rank'){initRank(room);}
+  else if(g==='draw'){initDraw(room,players);}
+  else if(g==='wolf'){initWolf(room,players);}
+  else if(g==='phone'){initPhone(room,players);}
+  else if(g==='voff'){initVoff(room,players);}
+}
+
+// ── POLL ───────────────────────────────────────────────────────
+async function poll(){
+  if(!S.id)return;
+  var room=await gS('room-'+S.id);
+  var players=await gS('room-'+S.id+'-players')||[];
+  if(!room)return;
+  S.room=room;S.players=players;
+  if(S.screen==='s-host-lobby')renderHL(S.id,room,players);
+  if(S.screen==='s-player-lobby'){renderPL(room,players);if(room.status==='playing')launchGame(room,players);}
+  if(room.status==='playing'||room.status==='results')await pollGame(room,players);
+}
+
+async function pollGame(room,players){
+  var g=room.game;
+  if(g==='rank'){
+    var sub=players.filter(function(p){return p.submitted}).length;
+    var el=document.getElementById('rk-prog');if(el)el.innerHTML='<strong>'+sub+'</strong> of <strong>'+players.length+'</strong> submitted';
+    if(room.status==='results'&&S.screen!=='s-rank-results')showRankResults(room,players);
+    if(S.host&&S.screen==='s-ranking'&&players.every(function(p){return p.submitted})){room.status='results';await sS('room-'+S.id,room);showRankResults(room,players);}
+  } else if(g==='draw'){
+    var ph=room.gs.phase;
+    if(ph==='vote'&&(S.screen==='s-draw'||S.screen==='s-player-lobby'))renderDrawGallery(room,players);
+    if(room.status==='results'&&S.screen!=='s-draw-results')showDrawResults(room,players);
+    if(S.host){
+      if(ph==='draw'&&players.every(function(p){return p.submitted})){room.gs.phase='vote';players.forEach(function(p){p.submitted=false});await sS('room-'+S.id,room);await sS('room-'+S.id+'-players',players);renderDrawGallery(room,players);}
+      if(ph==='vote'&&players.every(function(p){return p.submitted})){room.status='results';await sS('room-'+S.id,room);showDrawResults(room,players);}
+    }
+  } else if(g==='wolf'){
+    await pollWolf(room,players);
+  } else if(g==='phone'){
+    await pollPhone(room,players);
+  } else if(g==='voff'){
+    await pollVoff(room,players);
+  }
+}
+
+// ── RANK GAME ──────────────────────────────────────────────────
+function initRank(room){
+  document.getElementById('rk-title').textContent='📋 '+room.cfg.title;
+  S.myRank=[...room.cfg.items].sort(function(){return Math.random()-.5});
+  S.rankDone=false;
+  document.getElementById('rk-btn-wrap').style.display='';
+  document.getElementById('rk-done').style.display='none';
+  renderRankList();go('s-ranking');
+}
+function renderRankList(){
+  document.getElementById('rk-list').innerHTML=S.myRank.map(function(item,i){
+    return'<li class="rank-item" draggable="true" data-i="'+i+'" ondragstart="ds(event)" ondragover="do_(event)" ondrop="dd(event)" ondragend="de(event)"><div class="rank-num">#'+(i+1)+'</div><div class="rank-text">'+esc(item)+'</div><div class="rank-arrows"><button onclick="mv('+i+',-1)">▲</button><button onclick="mv('+i+',1)">▼</button></div></li>';
+  }).join('');
+}
+function mv(i,d){var j=i+d;if(j<0||j>=S.myRank.length)return;var t=S.myRank[i];S.myRank[i]=S.myRank[j];S.myRank[j]=t;renderRankList();}
+var dI=null;
+function ds(e){dI=+e.currentTarget.dataset.i;e.currentTarget.classList.add('dragging');}
+function do_(e){e.preventDefault();document.querySelectorAll('.rank-item').forEach(function(el){el.classList.remove('drag-over')});e.currentTarget.classList.add('drag-over');}
+function dd(e){e.preventDefault();var t=+e.currentTarget.dataset.i;if(dI!==null&&dI!==t){var m=S.myRank.splice(dI,1)[0];S.myRank.splice(t,0,m);renderRankList();}}
+function de(){document.querySelectorAll('.rank-item').forEach(function(el){el.classList.remove('dragging','drag-over')});dI=null;}
+async function rankSubmit(){
+  await sS('room-'+S.id+'-vote-'+S.me,S.myRank);
+  var players=await gS('room-'+S.id+'-players')||[];
+  var p=players.find(function(x){return x.name===S.me});if(p)p.submitted=true;
+  await sS('room-'+S.id+'-players',players);
+  document.getElementById('rk-btn-wrap').style.display='none';
+  document.getElementById('rk-done').style.display='';
+  toast('✅ Submitted!');
+}
+async function showRankResults(room,players){
+  stopP();
+  var items=room.cfg.items,N=items.length,scores={},votes=0;
+  items.forEach(function(x){scores[x]=0});
+  for(var i=0;i<players.length;i++){var v=await gS('room-'+S.id+'-vote-'+players[i].name);if(v){votes++;v.forEach(function(item,idx){if(scores[item]!==undefined)scores[item]+=(N-idx)});}}
+  var max=votes*N;
+  var sorted=items.map(function(x){return{item:x,score:scores[x]}}).sort(function(a,b){return b.score-a.score});
+  var icons=['🥇','🥈','🥉'];
+  document.getElementById('rr-sub').textContent='Based on '+votes+' vote'+(votes!==1?'s':'');
+  document.getElementById('rr-list').innerHTML=sorted.map(function(x,i){
+    var pct=max>0?Math.round(x.score/max*100):0;
+    var cls=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    return'<div class="res-item"><div class="res-rank '+cls+'">'+(icons[i]||'#'+(i+1))+'</div><div class="res-info"><div class="res-name">'+esc(x.item)+'</div><div class="res-bar-wrap"><div class="res-bar" style="width:'+pct+'%"></div></div></div><div class="res-score">'+pct+'%</div></div>';
+  }).join('');
+  go('s-rank-results');
+}
+
+// ── CANVAS ─────────────────────────────────────────────────────
+var CV=null,CX=null,drawing=false,lx=0,ly=0;
+function initCanvas(id){
+  CV=document.getElementById(id);CX=CV.getContext('2d');
+  CX.fillStyle='#fff';CX.fillRect(0,0,CV.width,CV.height);
+  CX.strokeStyle=S.drawColor;CX.lineWidth=S.drawSize;CX.lineCap='round';CX.lineJoin='round';
+  CV.onmousedown=function(e){drawing=true;var p=xy(e);lx=p[0];ly=p[1];};
+  CV.onmousemove=function(e){if(!drawing)return;doDraw(e);};
+  CV.onmouseup=CV.onmouseleave=function(){drawing=false;};
+  CV.ontouchstart=function(e){e.preventDefault();drawing=true;var p=xy(e.touches[0]);lx=p[0];ly=p[1];};
+  CV.ontouchmove=function(e){e.preventDefault();if(!drawing)return;doDraw(e.touches[0]);};
+  CV.ontouchend=function(){drawing=false;};
+}
+function xy(e){var r=CV.getBoundingClientRect();var sx=CV.width/r.width,sy=CV.height/r.height;return[(e.clientX-r.left)*sx,(e.clientY-r.top)*sy];}
+function doDraw(e){var p=xy(e);CX.beginPath();CX.moveTo(lx,ly);CX.lineTo(p[0],p[1]);CX.strokeStyle=S.eraser?'#fff':S.drawColor;CX.lineWidth=S.eraser?20:S.drawSize;CX.stroke();lx=p[0];ly=p[1];}
+function setColor(c,el){S.drawColor=c;S.eraser=false;document.querySelectorAll('.color-btn').forEach(function(b){b.classList.remove('active')});el.classList.add('active');var eb=document.getElementById('beraser');if(eb)eb.classList.remove('active');}
+function setBrush(sz,el){S.drawSize=sz;S.eraser=false;document.querySelectorAll('.tool-btn').forEach(function(b){if(b.id&&(b.id==='bsm'||b.id==='blg'))b.classList.remove('active')});el.classList.add('active');}
+function setEraser(el){S.eraser=true;document.querySelectorAll('.color-btn').forEach(function(b){b.classList.remove('active')});el.classList.add('active');}
+function clearCanvas(){if(CX){CX.fillStyle='#fff';CX.fillRect(0,0,CV.width,CV.height);}}
+
+// ── DRAW GAME ──────────────────────────────────────────────────
+function initDraw(room,players){
+  if(room.gs.phase==='vote')return renderDrawGallery(room,players);
+  if(room.status==='results')return showDrawResults(room,players);
+  document.getElementById('dr-prompt').textContent=room.cfg.prompt;
+  document.getElementById('dr-sub-btn').style.display='';
+  document.getElementById('dr-done').style.display='none';
+  initCanvas('draw-canvas');go('s-draw');
+}
+async function drawSubmit(){
+  var img=CV.toDataURL('image/jpeg',0.45);
+  await sS('room-'+S.id+'-img-'+S.me,img);
+  var players=await gS('room-'+S.id+'-players')||[];
+  var p=players.find(function(x){return x.name===S.me});if(p)p.submitted=true;
+  await sS('room-'+S.id+'-players',players);
+  document.getElementById('dr-sub-btn').style.display='none';
+  document.getElementById('dr-done').style.display='';
+  toast('🎨 Drawing submitted!');
+}
+async function renderDrawGallery(room,players){
+  go('s-draw-vote');
+  var imgs=[];
+  for(var i=0;i<players.length;i++){var img=await gS('room-'+S.id+'-img-'+players[i].name);if(img)imgs.push({name:players[i].name,img:img});}
+  imgs=imgs.sort(function(){return Math.random()-.5});
+  document.getElementById('dr-gallery').innerHTML=imgs.map(function(x,i){
+    var isMe=x.name===S.me;
+    return'<div class="gcard'+(isMe?' mine':'')+'" id="gc'+i+'" data-name="'+esc(x.name)+'"><img src="'+x.img+'"><div class="gcard-lbl">'+(isMe?'Your drawing':'Drawing '+(i+1))+'</div></div>';
+  }).join('');
+  document.getElementById('dv-btn').disabled=true;document.getElementById('dv-btn').textContent='Select a drawing first';
+  document.getElementById('dv-done').style.display='none';
+  if(!S.drawDone)imgs.forEach(function(x,i){
+    if(x.name===S.me)return;
+    var el=document.getElementById('gc'+i);
+    if(el)el.onclick=function(){document.querySelectorAll('.gcard').forEach(function(c){c.classList.remove('selected')});el.classList.add('selected');S.drawVote=x.name;document.getElementById('dv-btn').disabled=false;document.getElementById('dv-btn').textContent='🗳️ Vote for this!';};
+  });
+}
+async function drawVoteSubmit(){
+  if(!S.drawVote)return;
+  await sS('room-'+S.id+'-vote-'+S.me,S.drawVote);
+  var players=await gS('room-'+S.id+'-players')||[];
+  var p=players.find(function(x){return x.name===S.me});if(p)p.submitted=true;
+  await sS('room-'+S.id+'-players',players);
+  S.drawDone=true;
+  document.getElementById('dv-btn').style.display='none';
+  document.getElementById('dv-done').style.display='';
+  toast('🗳️ Vote cast!');
+}
+async function showDrawResults(room,players){
+  stopP();
+  var scores={};players.forEach(function(p){scores[p.name]=0});
+  for(var i=0;i<players.length;i++){var v=await gS('room-'+S.id+'-vote-'+players[i].name);if(v&&scores[v]!==undefined)scores[v]++;}
+  var sorted=players.map(function(p){return{name:p.name,votes:scores[p.name]}}).sort(function(a,b){return b.votes-a.votes});
+  var imgs={};for(var i=0;i<players.length;i++){var img=await gS('room-'+S.id+'-img-'+players[i].name);if(img)imgs[players[i].name]=img;}
+  var icons=['🥇','🥈','🥉'];
+  document.getElementById('dr-res').innerHTML=sorted.map(function(x,i){
+    return'<div class="res-item" style="flex-direction:column;align-items:stretch"><div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><div class="res-rank '+(i===0?'r1':i===1?'r2':i===2?'r3':'rn')+'">'+(icons[i]||'#'+(i+1))+'</div><div class="res-info"><div class="res-name">'+esc(x.name)+'</div><div style="font-size:.72rem;color:var(--muted)">'+x.votes+' vote'+(x.votes!==1?'s':'')+'</div></div></div>'+(imgs[x.name]?'<img src="'+imgs[x.name]+'" style="width:100%;border-radius:8px">' :'')+'</div>';
+  }).join('');
+  go('s-draw-results');
+}
+
+// ── WEREWOLF ───────────────────────────────────────────────────
+async function initWolf(room,players){
+  var rd=await gS('room-'+S.id+'-role-'+S.me);
+  S.wolfRole=rd||'villager';
+  var div=document.getElementById('wf-reveal');
+  if(S.wolfRole==='wolf'){div.innerHTML='<div class="role-icon">🐺</div><div class="role-name" style="color:var(--coral)">You\'re a Wolf!</div><div style="color:var(--muted);font-size:.84rem;line-height:1.5">Blend in. Vote strategically. Don\'t get caught!<br><br>Eliminate villagers at night. Survive the day votes.</div>';}
+  else{div.innerHTML='<div class="role-icon">🧑‍🤝‍🧑</div><div class="role-name" style="color:var(--green)">You\'re a Villager!</div><div style="color:var(--muted);font-size:.84rem;line-height:1.5">Work with your team. Find and eliminate all wolves!<br><br>Discuss clues on Zoom. Vote wisely.</div>';}
+  go('s-wolf-role');
+}
+async function wolfReady(){
+  var players=await gS('room-'+S.id+'-players')||[];
+  var p=players.find(function(x){return x.name===S.me});if(p)p.submitted=true;
+  await sS('room-'+S.id+'-players',players);
+  if(S.host&&players.every(function(p){return p.submitted})){
+    var room=await gS('room-'+S.id);room.gs.phase='day';
+    players.forEach(function(p){p.submitted=false});
+    await sS('room-'+S.id,room);await sS('room-'+S.id+'-players',players);
+    renderWolfDay(room,players);
+  } else {
+    go('s-player-lobby');document.getElementById('pl-title').textContent='Waiting for everyone to read their role...';
+  }
+}
+function renderWolfDay(room,players){
+  var alive=players.filter(function(p){return p.alive&&p.name!==S.me});
+  document.getElementById('wd-round').textContent=room.gs.round||1;
+  document.getElementById('wd-prog').innerHTML='';
+  document.getElementById('wd-btn').disabled=true;document.getElementById('wd-done').style.display='none';
+  S.wolfVote=null;
+  document.getElementById('wd-list').innerHTML=alive.map(function(p){
+    return'<div class="wv-item" data-name="'+esc(p.name)+'" onclick="wvPick(this,\'wd-list\',\'wd-btn\')"><span style="font-weight:800">'+esc(p.name)+'</span></div>';
+  }).join('');
+  go('s-wolf-day');
+}
+function wvPick(el,lid,bid){document.querySelectorAll('#'+lid+' .wv-item').forEach(function(x){x.classList.remove('selected')});el.classList.add('selected');S.wolfVote=el.dataset.name;document.getElementById(bid).disabled=false;}
+async function wolfDayVote(){
+  if(!S.wolfVote)return;
+  var room=await gS('room-'+S.id);
+  room.gs.dayVotes=room.gs.dayVotes||{};room.gs.dayVotes[S.me]=S.wolfVote;
+  await sS('room-'+S.id,room);
+  var players=await gS('room-'+S.id+'-players')||[];
+  var p=players.find(function(x){return x.name===S.me});if(p)p.submitted=true;
+  await sS('room-'+S.id+'-players',players);
+  document.getElementById('wd-btn').style.display='none';document.getElementById('wd-done').style.display='';
+  toast('🗳️ Voted!');
+}
+function renderWolfNight(room,players){
+  var targets=players.filter(function(p){return p.alive&&p.name!==S.me&&room.gs.roles&&room.gs.roles[p.name]!=='wolf'});
+  S.wolfVote=null;document.getElementById('wn-btn').disabled=true;document.getElementById('wn-done').style.display='none';
+  document.getElementById('wn-list').innerHTML=targets.map(function(p){
+    return'<div class="wv-item" data-name="'+esc(p.name)+'" onclick="wvPick(this,\'wn-list\',\'wn-btn\')"><span style="font-weight:800">'+esc(p.name)+'</span></div>';
+  }).join('');
+  go('s-wolf-night-wolf');
+}
+async function wolfNightVote(){
+  if(!S.wolfVote)return;
+  var room=await gS('room-'+S.id);
+  room.gs.nightVotes=room.gs.nightVotes||{};room.gs.nightVotes[S.me]=S.wolfVote;
+  await sS('room-'+S.id,room);
+  document.getElementById('wn-btn').style.display='none';document.getElementById('wn-done').style.display='';
+  toast('🌙 Voted!');
+}
+function renderWolfElim(room,players){
+  var gs=room.gs;
+  document.getElementById('we-title').textContent=gs.elimFrom==='night'?'🌙 Night Elimination':'☀️ Day Elimination';
+  document.getElementById('we-phase').textContent=gs.elimFrom==='night'?'Eliminated at Night':'Voted Out';
+  document.getElementById('we-name').textContent=gs.lastElim||'—';
+  var role=gs.roles&&gs.roles[gs.lastElim];
+  document.getElementById('we-role').textContent='They were a '+(role==='wolf'?'🐺 Wolf':'🧑 Villager');
+  if(S.host){
+    var wolves=players.filter(function(p){return p.alive&&gs.roles&&gs.roles[p.name]==='wolf'}).length;
+    var vills=players.filter(function(p){return p.alive&&gs.roles&&gs.roles[p.name]!=='wolf'}).length;
+    document.getElementById('we-status').innerHTML='🐺 Wolves alive: <strong>'+wolves+'</strong> &nbsp;|&nbsp; 🧑 Villagers alive: <strong>'+vills+'</strong>';
+    document.getElementById('we-host-ctrl').style.display='';document.getElementById('we-wait').style.display='none';
+  } else {document.getElementById('we-host-ctrl').style.display='none';document.getElementById('we-wait').style.display='';}
+  go('s-wolf-elim');
+}
+async function wolfContinue(){
+  var room=await gS('room-'+S.id);
+  var players=await gS('room-'+S.id+'-players')||[];
+  var gs=room.gs;
+  var wolves=players.filter(function(p){return p.alive&&gs.roles&&gs.roles[p.name]==='wolf'}).length;
+  var vills=players.filter(function(p){return p.alive&&gs.roles&&gs.roles[p.name]!=='wolf'}).length;
+  if(wolves===0){gs.phase='end';gs.winner='villagers';}
+  else if(wolves>=vills){gs.phase='end';gs.winner='wolves';}
+  else{gs.phase='night';gs.nightVotes={};players.forEach(function(p){p.submitted=false});}
+  await sS('room-'+S.id,room);await sS('room-'+S.id+'-players',players);
+  if(gs.phase==='end')renderWolfEnd(room,players);
+  else if(S.wolfRole==='wolf')renderWolfNight(room,players);
+  else go('s-wolf-night-sleep');
+}
+async function wolfEndNow(){
+  var room=await gS('room-'+S.id);room.gs.phase='end';room.gs.winner='draw';
+  await sS('room-'+S.id,room);renderWolfEnd(room,await gS('room-'+S.id+'-players')||[]);
+}
+function renderWolfEnd(room,players){
+  stopP();var w=room.gs.winner;
+  document.getElementById('wend-icon').textContent=w==='villagers'?'🧑‍🤝‍🧑':w==='wolves'?'🐺':'🤝';
+  document.getElementById('wend-title').textContent=w==='villagers'?'Villagers Win!':w==='wolves'?'Wolves Win!':'Game Over';
+  document.getElementById('wend-desc').textContent=w==='villagers'?'All wolves found!':w==='wolves'?'The wolves took over!':'';
+  document.getElementById('wend-list').innerHTML=players.map(function(p){var r=room.gs.roles&&room.gs.roles[p.name];return'<div class="pitem"><span class="pname">'+esc(p.name)+'</span><span class="pstatus '+(r==='wolf'?'swolf':'sd')+'">'+(r==='wolf'?'🐺 Wolf':'🧑 Villager')+'</span></div>'}).join('');
+  go('s-wolf-end');
+}
+async function pollWolf(room,players){
+  var gs=room.gs;if(!gs)return;
+  if(S.screen==='s-wolf-role')return;
+  if(S.host){
+    if(gs.phase==='role'&&players.every(function(p){return p.submitted})){
+      gs.phase='day';players.forEach(function(p){p.submitted=false});
+      await sS('room-'+S.id,room);await sS('room-'+S.id+'-players',players);
+      renderWolfDay(room,players);
+    } else if(gs.phase==='day'){
+      var alive=players.filter(function(p){return p.alive});
+      if(alive.length>0&&alive.every(function(p){return p.submitted})){
+        var tally={};Object.values(gs.dayVotes||{}).forEach(function(v){tally[v]=(tally[v]||0)+1});
+        var elim=Object.keys(tally).sort(function(a,b){return tally[b]-tally[a]})[0];
+        var ep=players.find(function(p){return p.name===elim});if(ep)ep.alive=false;
+        gs.lastElim=elim;gs.elimFrom='day';gs.phase='elim';gs.dayVotes={};
+        players.forEach(function(p){p.submitted=false});
+        await sS('room-'+S.id,room);await sS('room-'+S.id+'-players',players);
+        renderWolfElim(room,players);
+      }
+    } else if(gs.phase==='night'){
+      var wolves=players.filter(function(p){return p.alive&&gs.roles&&gs.roles[p.name]==='wolf'});
+      if(wolves.length>0&&wolves.every(function(w){return gs.nightVotes&&gs.nightVotes[w.name]})){
+        var tally={};Object.values(gs.nightVotes||{}).forEach(function(v){tally[v]=(tally[v]||0)+1});
+        var elim=Object.keys(tally).sort(function(a,b){return tally[b]-tally[a]})[0];
+        var ep=players.find(function(p){return p.name===elim});if(ep)ep.alive=false;
+        gs.lastElim=elim;gs.elimFrom='night';gs.phase='elim';gs.round=(gs.round||1)+1;gs.nightVotes={};
+        players.forEach(function(p){p.submitted=false});
+        await sS('room-'+S.id,room);await sS('room-'+S.id+'-players',players);
+        renderWolfElim(room,players);
+      }
+    }
+  } else {
+    var cur=S.screen;
+    if(gs.phase==='day'&&cur!=='s-wolf-day')renderWolfDay(room,players);
+    else if(gs.phase==='night'&&cur!=='s-wolf-night-wolf'&&cur!=='s-wolf-night-sleep'){if(S.wolfRole==='wolf')renderWolfNight(room,players);else go('s-wolf-night-sleep');}
+    else if(gs.phase==='elim'&&cur!=='s-wolf-elim')renderWolfElim(room,players);
+    else if(gs.phase==='end'&&cur!=='s-wolf-end')renderWolfEnd(room,players);
+  }
+  var sub=players.filter(function(p){return p.submitted}).length;
+  var el=document.getElementById('wd-prog');if(el&&gs.phase==='day')el.innerHTML='<strong>'+sub+'</strong> of <strong>'+players.filter(function(p){return p.alive}).length+'</strong> voted';
+}
+
+// ── TELEPHONE ──────────────────────────────────────────────────
+async function initPhone(room,players){
+  if(room.status==='results'){await phoneReveal(room,players);return;}
+  var myIdx=players.findIndex(function(p){return p.name===S.me});
+  var gs=room.gs;
+  if(gs.step===myIdx){
+    var prev=await gS('room-'+S.id+'-chain-'+(myIdx-1));
+    if(myIdx%2===1){// draw turn
+      document.getElementById('ph-draw-prompt').textContent=prev?prev.content:'...';
+      initCanvas('draw-canvas');go('s-phone-draw');
+    } else {// write turn
+      var wrap=document.getElementById('ph-prev-wrap');
+      if(prev&&prev.type==='drawing')wrap.innerHTML='<img src="'+prev.content+'" style="width:100%;display:block">';
+      else wrap.innerHTML='<div style="padding:14px;text-align:center;font-style:italic;font-size:.9rem">"'+esc(prev?prev.content:'...')+'"</div>';
+      document.getElementById('ph-txt').value='';
+      go('s-phone-text');
+    }
+  } else if(gs.step>=players.length){await phoneReveal(room,players);}
+  else {document.getElementById('ph-wait-prog').innerHTML='Step <strong>'+gs.step+'</strong> of <strong>'+players.length+'</strong>';go('s-phone-wait');}
+}
+async function phoneTextSubmit(){
+  var txt=document.getElementById('ph-txt').value.trim();if(!txt)return toast('✏️ Write something!');
+  var myIdx=S.players.findIndex(function(p){return p.name===S.me});
+  await sS('room-'+S.id+'-chain-'+myIdx,{type:'text',content:txt,by:S.me});
+  await phoneAdv();
+}
+async function phoneDrawSubmit(){
+  var img=CV.toDataURL('image/jpeg',0.45);
+  var myIdx=S.players.findIndex(function(p){return p.name===S.me});
+  await sS('room-'+S.id+'-chain-'+myIdx,{type:'drawing',content:img,by:S.me});
+  await phoneAdv();
+}
+async function phoneAdv(){
+  var room=await gS('room-'+S.id);
+  var players=await gS('room-'+S.id+'-players')||[];
+  room.gs.step++;
+  if(room.gs.step>=players.length)room.status='results';
+  await sS('room-'+S.id,room);
+  toast('✅ Submitted!');
+  if(room.status==='results')await phoneReveal(room,players);
+  else{document.getElementById('ph-wait-prog').textContent='Waiting for next player...';go('s-phone-wait');}
+}
+async function phoneReveal(room,players){
+  stopP();
+  var chain=[];
+  for(var i=0;i<players.length;i++){var s=await gS('room-'+S.id+'-chain-'+i);if(s)chain.push(s);}
+  document.getElementById('ph-chain').innerHTML=chain.map(function(step,i){
+    return'<div class="chain-step '+(step.type==='drawing'?'td':'tt')+'"><div class="chain-meta">'+(i===0?'🌟 Original phrase':step.type==='drawing'?'🎨 '+step.by+' drew':'✏️ '+step.by+' described')+'</div>'+(step.type==='drawing'?'<img src="'+step.content+'" alt="">':'<div class="chain-text">"'+esc(step.content)+'"</div>')+'</div>';
+  }).join('');
+  go('s-phone-reveal');
+}
+async function pollPhone(room,players){
+  if(S.screen==='s-phone-reveal')return;
+  if(room.status==='results'){await phoneReveal(room,players);return;}
+  var myIdx=players.findIndex(function(p){return p.name===S.me});
+  var gs=room.gs;
+  if(gs.step===myIdx&&S.screen==='s-phone-wait')initPhone(room,players);
+  else if(gs.step>=players.length)await phoneReveal(room,players);
+  else{var el=document.getElementById('ph-wait-prog');if(el)el.innerHTML='Step <strong>'+gs.step+'</strong> of <strong>'+players.length+'</strong>';}
+}
+
+// ── VOTE OFF ───────────────────────────────────────────────────
+function initVoff(room,players){
+  var gs=room.gs;
+  if(gs.opts&&gs.opts.length===1){renderVoffWinner(room);return;}
+  if(gs.phase==='result'){renderVoffElim(room,players);return;}
+  renderVoffVote(room,players);
+}
+function renderVoffVote(room,players){
+  var gs=room.gs;
+  document.getElementById('vo-title').textContent=room.cfg.title;
+  document.getElementById('vo-round').textContent=gs.round||1;
+  S.voffChoice=null;document.getElementById('vo-btn').disabled=true;document.getElementById('vo-done').style.display='none';
+  document.getElementById('vo-opts').innerHTML=(gs.opts||[]).map(function(opt){
+    return'<div class="voff-opt" data-opt="'+esc(opt)+'" onclick="voffPick(this)"><span style="font-weight:800">'+esc(opt)+'</span></div>';
+  }).join('');
+  go('s-voff-vote');
+}
+function voffPick(el){document.querySelectorAll('.voff-opt').forEach(function(x){x.classList.remove('selected')});el.classList.add('selected');S.voffChoice=el.dataset.opt;document.getElementById('vo-btn').disabled=false;}
+async function voffVote(){
+  if(!S.voffChoice)return;
+  var room=await gS('room-'+S.id);room.gs.votes=room.gs.votes||{};room.gs.votes[S.me]=S.voffChoice;
+  await sS('room-'+S.id,room);
+  var players=await gS('room-'+S.id+'-players')||[];
+  var p=players.find(function(x){return x.name===S.me});if(p)p.submitted=true;
+  await sS('room-'+S.id+'-players',players);
+  document.getElementById('vo-btn').style.display='none';document.getElementById('vo-done').style.display='';
+  toast('🗳️ Vote cast!');
+}
+function renderVoffElim(room,players){
+  var gs=room.gs;
+  document.getElementById('vo-elim-name').textContent=gs.lastElim||'—';
+  document.getElementById('vo-elim-votes').textContent=(gs.lastElimVotes||0)+' vote'+(gs.lastElimVotes!==1?'s':'');
+  document.getElementById('vo-remaining').innerHTML=(gs.opts||[]).map(function(opt){return'<div class="voff-opt" style="cursor:default"><span style="font-weight:800">'+esc(opt)+'</span></div>'}).join('');
+  if(S.host){document.getElementById('vo-host-ctrl').style.display='';document.getElementById('vo-wait').style.display='none';}
+  else{document.getElementById('vo-host-ctrl').style.display='none';document.getElementById('vo-wait').style.display='';}
+  go('s-voff-elim');
+}
+async function voffNext(){
+  var room=await gS('room-'+S.id);
+  room.gs.phase='vote';room.gs.votes={};room.gs.round=(room.gs.round||1)+1;
+  await sS('room-'+S.id,room);
+  var players=await gS('room-'+S.id+'-players')||[];
+  players.forEach(function(p){p.submitted=false});
+  await sS('room-'+S.id+'-players',players);
+  renderVoffVote(room,players);
+}
+function renderVoffWinner(room){
+  stopP();var gs=room.gs;
+  document.getElementById('vo-winner').textContent=gs.opts?gs.opts[0]:'🏆';
+  var icons=['1st 🎉','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'];
+  document.getElementById('vo-history').innerHTML=(gs.eliminated||[]).reverse().map(function(x,i){
+    return'<div class="res-item"><div class="res-rank rn" style="font-size:.8rem">'+icons[i]+'</div><div class="res-info"><div class="res-name">'+esc(x.name)+'</div><div style="font-size:.72rem;color:var(--muted)">Eliminated with '+x.votes+' vote'+(x.votes!==1?'s':'')+'</div></div></div>';
+  }).join('');
+  go('s-voff-winner');
+}
+async function pollVoff(room,players){
+  var gs=room.gs;if(!gs)return;
+  if(gs.opts&&gs.opts.length===1){renderVoffWinner(room);return;}
+  if(gs.phase==='result'){if(S.screen!=='s-voff-elim')renderVoffElim(room,players);return;}
+  var sub=players.filter(function(p){return p.submitted}).length;
+  var el=document.getElementById('vo-prog');if(el)el.innerHTML='<strong>'+sub+'</strong> of <strong>'+players.length+'</strong> voted';
+  if(S.host&&players.every(function(p){return p.submitted})){
+    var tally={};Object.values(gs.votes||{}).forEach(function(v){tally[v]=(tally[v]||0)+1});
+    var elim=Object.keys(tally).sort(function(a,b){return tally[b]-tally[a]})[0];
+    var votes=tally[elim]||0;
+    gs.opts=gs.opts.filter(function(x){return x!==elim});
+    gs.eliminated.push({name:elim,votes:votes});
+    gs.phase='result';gs.lastElim=elim;gs.lastElimVotes=votes;
+    players.forEach(function(p){p.submitted=false});
+    await sS('room-'+S.id,room);await sS('room-'+S.id+'-players',players);
+    if(gs.opts.length===1)renderVoffWinner(room);else renderVoffElim(room,players);
+  }
+}
+
+// ── AUTO-JOIN FROM URL HASH ────────────────────────────────────
+window.addEventListener('load',function(){
+  var hash=location.hash.slice(1).toUpperCase();
+  if(hash.startsWith('ROOM-')){document.getElementById('j-code').value=hash;go('s-join');}
+});
+</script>
+</body>
+</html>
